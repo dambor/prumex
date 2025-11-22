@@ -1,9 +1,15 @@
 {
   "name": "prumex",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "engines": {
     "node": "18.x"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@jsr/supabase__supabase-js": "^2.49.8",
@@ -38,6 +44,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.0",
     "cmdk": "^1.1.1",
+    "date-fns": "^3.0.6",
     "embla-carousel-react": "^8.6.0",
     "hono": "^4.6.14",
     "input-otp": "^1.4.2",
@@ -57,14 +64,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "@types/react": "^18.3.1",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react-swc": "^3.10.2",
-    "typescript": "^5.3.3",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.2.2",
     "vite": "^6.3.5"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build"
   }
 }
