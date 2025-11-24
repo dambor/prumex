@@ -18,7 +18,7 @@ spec:
       - name: prumex
         # REPLACE WITH YOUR IMAGE NAME (e.g., dambor/prumex:latest)
         image: glenioborges/prumex
-        imagePullPolicy: IfNotPresent # Useful for local testing if image isn't pushed
+        imagePullPolicy: Always # Useful for local testing if image isn't pushed
         ports:
         - containerPort: 80
         resources:
