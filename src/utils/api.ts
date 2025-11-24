@@ -44,16 +44,16 @@ function getHeaders() {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
-  
+
   // Só adicionar Authorization se tivermos accessToken
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`;
   }
-  
+
   if (currentProjectId) {
     headers['X-Project-Id'] = currentProjectId;
   }
-  
+
   return headers;
 }
 
@@ -88,7 +88,7 @@ export async function fetchExpenses(): Promise<Expense[]> {
     console.log('🔄 fetchExpenses - Calling API...');
     console.log('  - URL:', `${API_BASE}/expenses`);
     console.log('  - Token:', accessToken ? 'Present (****)' : 'Using publicAnonKey');
-    
+
     const response = await fetch(`${API_BASE}/expenses`, {
       headers: getHeaders(),
       signal: AbortSignal.timeout(5000) // 5 second timeout (reduced from 10s)
@@ -99,23 +99,23 @@ export async function fetchExpenses(): Promise<Expense[]> {
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Unknown error' }));
       console.error('❌ Failed to fetch expenses:', response.status, error);
-      
+
       // Se não houver despesas ainda, retornar array vazio
       if (response.status === 500) {
         return [];
       }
-      
+
       throw new Error(error.error || 'Failed to fetch expenses');
     }
 
     const data = await response.json();
     console.log('✅ fetchExpenses - Received data:', data);
     console.log('  - Expenses array length:', data.expenses?.length || 0);
-    
+
     if (data.expenses && data.expenses.length > 0) {
       console.log('  - First expense:', data.expenses[0]);
     }
-    
+
     return data.expenses || [];
   } catch (error) {
     if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
@@ -131,7 +131,7 @@ export async function fetchExpenses(): Promise<Expense[]> {
 export async function createExpense(expense: Omit<Expense, 'id' | 'createdAt' | 'createdBy'>): Promise<Expense> {
   console.log('Creating expense with token:', accessToken ? 'Token present' : 'No token');
   console.log('Expense data:', expense);
-  
+
   const response = await fetch(`${API_BASE}/expenses`, {
     method: 'POST',
     headers: getHeaders(),
@@ -185,7 +185,7 @@ export async function uploadFile(file: File, type: 'invoice' | 'receipt', expens
   formData.append('expenseId', expenseId);
 
   const headers: Record<string, string> = {};
-  
+
   // Só adicionar Authorization se tivermos accessToken
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`;
@@ -227,16 +227,16 @@ export async function fetchSettings() {
     console.log('🔍 API: fetchSettings called');
     console.log('  - Current Project ID:', currentProjectId);
     console.log('  - Headers:', getHeaders());
-    
+
     const response = await fetch(`${API_BASE}/settings`, {
       headers: getHeaders(),
       signal: AbortSignal.timeout(5000) // 5 second timeout (reduced from 10s)
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch settings');
     }
-    
+
     const data = await response.json();
     console.log('  - Settings received:', data.settings);
     return data.settings;
@@ -256,7 +256,7 @@ export async function updateSettings(settings: { budget: number; categoryBudgets
   console.log('  - Current Project ID:', currentProjectId);
   console.log('  - Settings to save:', settings);
   console.log('  - Headers:', getHeaders());
-  
+
   const response = await fetch(`${API_BASE}/settings`, {
     method: 'PUT',
     headers: getHeaders(),
@@ -433,7 +433,7 @@ export async function removeProjectMember(projectId: string, memberEmail: string
 export async function fetchPhases(): Promise<any[]> {
   try {
     console.log('🔄 fetchPhases - Calling API...');
-    
+
     const response = await fetch(`${API_BASE}/phases`, {
       headers: getHeaders()
     });
@@ -444,7 +444,7 @@ export async function fetchPhases(): Promise<any[]> {
 
     const data = await response.json();
     console.log('✅ fetchPhases - Received:', data.phases.length, 'phases');
-    
+
     return data.phases || [];
   } catch (error) {
     console.error('❌ Exception fetching phases:', error);
@@ -455,7 +455,7 @@ export async function fetchPhases(): Promise<any[]> {
 export async function savePhases(phases: any[]): Promise<any[]> {
   try {
     console.log('💾 savePhases - Saving', phases.length, 'phases...');
-    
+
     const response = await fetch(`${API_BASE}/phases`, {
       method: 'PUT',
       headers: getHeaders(),
@@ -468,7 +468,7 @@ export async function savePhases(phases: any[]): Promise<any[]> {
 
     const data = await response.json();
     console.log('✅ Phases saved successfully');
-    
+
     return data.phases || [];
   } catch (error) {
     console.error('❌ Exception saving phases:', error);
@@ -531,7 +531,7 @@ export async function clearAllExpenses() {
     console.log('🗑️ clearAllExpenses - Calling DELETE /expenses/clear-all');
     console.log('  - API_BASE:', API_BASE);
     console.log('  - Access token:', accessToken ? 'Present' : 'Missing');
-    
+
     const response = await fetch(`${API_BASE}/expenses/clear-all`, {
       method: 'DELETE',
       headers: getHeaders()
@@ -543,14 +543,14 @@ export async function clearAllExpenses() {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('  ❌ Server returned error:', errorText);
-      
+
       let errorObj;
       try {
         errorObj = JSON.parse(errorText);
       } catch {
         errorObj = { error: errorText };
       }
-      
+
       throw new Error(errorObj.error || `HTTP ${response.status}: ${errorText}`);
     }
 
@@ -569,7 +569,7 @@ export async function extractInvoiceData(file: File): Promise<any> {
     console.log('📄 extractInvoiceData - Starting OCR extraction...');
     console.log('  - File type:', file.type);
     console.log('  - File name:', file.name);
-    
+
     // Converter arquivo para base64
     const reader = new FileReader();
     const base64Promise = new Promise<string>((resolve, reject) => {
@@ -580,26 +580,26 @@ export async function extractInvoiceData(file: File): Promise<any> {
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-    
+
     const imageBase64 = await base64Promise;
     console.log('  - Image converted to base64');
     console.log('  - Base64 preview:', imageBase64.substring(0, 100) + '...');
-    
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-    
+
     // Só adicionar Authorization se tivermos accessToken
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;
     }
-    
+
     const response = await fetch(`${API_BASE}/extract-invoice`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         imageBase64,
-        mimeType: file.type 
+        mimeType: file.type
       }),
     });
 
@@ -609,7 +609,7 @@ export async function extractInvoiceData(file: File): Promise<any> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
       console.error('OCR API error:', errorData);
-      
+
       throw new Error(errorData.error || 'Falha ao processar imagem com IA');
     }
 
@@ -619,7 +619,7 @@ export async function extractInvoiceData(file: File): Promise<any> {
     console.log('  - result.success:', result.success);
     console.log('  - result.data:', result.data);
     console.log('  - Type of result.data:', typeof result.data);
-    
+
     if (result.data) {
       console.log('  - result.data.amount:', result.data.amount);
       console.log('  - result.data.description:', result.data.description);
@@ -627,7 +627,7 @@ export async function extractInvoiceData(file: File): Promise<any> {
       console.log('  - result.data.category:', result.data.category);
       console.log('  - result.data.pixKey:', result.data.pixKey);
     }
-    
+
     return result.data;
   } catch (error) {
     console.error('Error extracting invoice data:', error);
@@ -651,7 +651,7 @@ export async function saveQuotation(quotation: any): Promise<any> {
 }
 
 // Documents API
-export async function fetchDocuments(projectId: string): Promise<any[]> {
+export async function fetchDocuments(_projectId: string): Promise<any[]> {
   try {
     const response = await fetch(`${API_BASE}/documents`, {
       headers: getHeaders()
@@ -669,7 +669,7 @@ export async function fetchDocuments(projectId: string): Promise<any[]> {
   }
 }
 
-export async function uploadDocument(projectId: string, docData: any): Promise<any> {
+export async function uploadDocument(_projectId: string, docData: any): Promise<any> {
   const formData = new FormData();
   formData.append('file', docData.file);
   formData.append('name', docData.name);
@@ -701,7 +701,7 @@ export async function uploadDocument(projectId: string, docData: any): Promise<a
   return response.json();
 }
 
-export async function signDocument(projectId: string, documentId: string, signature: any): Promise<void> {
+export async function signDocument(_projectId: string, documentId: string, signature: any): Promise<void> {
   const response = await fetch(`${API_BASE}/documents/${documentId}/sign`, {
     method: 'POST',
     headers: getHeaders(),
@@ -713,7 +713,7 @@ export async function signDocument(projectId: string, documentId: string, signat
   }
 }
 
-export async function deleteDocument(projectId: string, documentId: string): Promise<void> {
+export async function deleteDocument(_projectId: string, documentId: string): Promise<void> {
   const response = await fetch(`${API_BASE}/documents/${documentId}`, {
     method: 'DELETE',
     headers: getHeaders()
@@ -733,7 +733,7 @@ export async function downloadDocument(fileUrl: string): Promise<Blob> {
 }
 
 // Photos API
-export async function fetchPhotos(projectId: string): Promise<any[]> {
+export async function fetchPhotos(_projectId: string): Promise<any[]> {
   try {
     const response = await fetch(`${API_BASE}/photos`, {
       headers: getHeaders()
@@ -751,7 +751,7 @@ export async function fetchPhotos(projectId: string): Promise<any[]> {
   }
 }
 
-export async function uploadPhoto(projectId: string, photoData: any): Promise<any> {
+export async function uploadPhoto(_projectId: string, photoData: any): Promise<any> {
   const formData = new FormData();
   formData.append('file', photoData.file);
   formData.append('caption', photoData.caption);
@@ -782,7 +782,7 @@ export async function uploadPhoto(projectId: string, photoData: any): Promise<an
   return response.json();
 }
 
-export async function deletePhoto(projectId: string, photoId: string): Promise<void> {
+export async function deletePhoto(_projectId: string, photoId: string): Promise<void> {
   const response = await fetch(`${API_BASE}/photos/${photoId}`, {
     method: 'DELETE',
     headers: getHeaders()
